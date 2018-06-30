@@ -27,6 +27,8 @@
     "apply-loader": "^2.0.0",
     "awesome-typescript-loader": "^3.1.2",
     "electron": "^1.6.11",
+    "mz": "^2.7.0",
+    "ps-node": "^0.1.6",
     "pug": "^2.0.0-rc.3",
     "pug-loader": "^2.3.0",
     "rxjs": "^5.4.0",

@@ -4,6 +4,46 @@ h3 Title Control
 .row
 	.col-md-6
 		.form-group
+			label Removals
+			input.form-control(
+				type='text',
+				[(ngModel)]='config.store.titleControl.replacePattern',
+				(ngModelChange)='config.save()',
+			)
+			p Replaces the title with a new value entirely
+	.col-md-3
+		dl
+			dt \t
+			dd The original, unprocessed title
+			dt \i
+			dd The tab ID (internal)
+			dt \scmd
+			dd The shell command (ie. powershell.exe)
+			dt \sname
+			dd The shell name (ie. Windows Powershell)
+	.col-md-3
+		dl
+			dt \spid
+			dd The shell PID
+			dt \pid
+			dd The PID of the first child process
+			dt \cmd
+			dd The command of the first child process (ie. node.exe)
+
+.row
+	.col-md-6
+		.form-group
+			label Removals
+			input.form-control(
+				type='text',
+				[(ngModel)]='config.store.titleControl.removePattern',
+				(ngModelChange)='config.save()',
+			)
+			p These values (comma separated) will be removed from all tab titles
+
+.row
+	.col-md-6
+		.form-group
 			label Prefix
 			input.form-control(
 				type='text',
@@ -22,14 +62,3 @@ h3 Title Control
 				(ngModelChange)='config.save()',
 			)
 			p This value will be suffixed to all terminal tab titles
-
-.row
-	.col-md-6
-		.form-group
-			label Removals
-			input.form-control(
-				type='text',
-				[(ngModel)]='config.store.titleControl.removePattern',
-				(ngModelChange)='config.save()',
-			)
-			p These values (comma separated) will be removed from all tab titles
