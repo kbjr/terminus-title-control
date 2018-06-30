@@ -1,6 +1,6 @@
 {
   "name": "terminus-title-control",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Title/Tab text control plugin for Terminus",
   "keywords": [
     "terminus-plugin"
