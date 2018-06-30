@@ -44,8 +44,8 @@ export class TitleControlService {
 		let { title } = tab;
 		const { prefix, suffix, removePattern } = this.config.store.titleControl;
 
-		if (removePattern != null) {
-			const toRemove = removePattern.split(/\s*,\s*/);
+		if (removePattern) {
+			const toRemove = removePattern.split(',');
 
 			toRemove.forEach((toRemove: string) => {
 				while (title.indexOf(toRemove) >= 0) {
@@ -54,11 +54,11 @@ export class TitleControlService {
 			});
 		}
 
-		if (prefix != null) {
+		if (prefix) {
 			title = prefix + title;
 		}
 
-		if (suffix != null) {
+		if (suffix) {
 			title = title + suffix;
 		}
 
