@@ -26,6 +26,7 @@ export class TitleControlService {
 			if (! this.knownTabs.has(tab)) {
 				this.onTabChange(tab);
 
+				// @ts-ignore: This property does, in fact, exist
 				tab.titleChange$.subscribe(() => {
 					this.onTabChange(tab);
 				});
@@ -63,6 +64,7 @@ export class TitleControlService {
 
 		this.knownTabs.set(tab, title);
 
+		// @ts-ignore: This property does, in fact, exist
 		tab.setTitle(title);
 	}
 }
