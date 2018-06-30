@@ -62,6 +62,10 @@ export class TitleControlService {
 			title = title + suffix;
 		}
 
+		if (! title.trim()) {
+			title = 'Terminal';
+		}
+
 		this.knownTabs.set(tab, title);
 
 		// @ts-ignore: This property does, in fact, exist
