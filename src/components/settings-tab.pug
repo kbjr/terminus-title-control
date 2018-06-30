@@ -4,13 +4,13 @@ h3 Title Control
 .row
 	.col-md-6
 		.form-group
-			label Removals
+			label Replace Pattern
 			input.form-control(
 				type='text',
 				[(ngModel)]='config.store.titleControl.replacePattern',
 				(ngModelChange)='config.save()',
 			)
-			p Replaces the title with a new value entirely
+			p Replaces the title with a new value entirely. The escape sequences listed can be used to insert metadata into the new title.
 	.col-md-3
 		dl
 			dt \t
