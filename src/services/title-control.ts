@@ -9,7 +9,9 @@ export class TitleControlService {
 	constructor(
 		private app: AppService,
 		private config: ConfigService,
-	) {
+	) { }
+
+	init() {
 		this.knownTabs = new WeakMap<BaseTabComponent, string>();
 
 		this.onTabsChange();

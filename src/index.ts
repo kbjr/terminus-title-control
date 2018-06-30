@@ -10,8 +10,6 @@ import { TitleControlConfigProvider } from './config';
 import { TitleControlSettingsTabProvider } from './settings';
 import { TitleControlSettingsTabComponent } from './components/settings-tab';
 
-debugger;
-
 @NgModule({
 	imports: [
 		CommonModule,
@@ -19,8 +17,8 @@ debugger;
 	],
 	providers: [
 		TitleControlService,
-		{ provide: ConfigProvider, useClass: TitleControlConfigProvider },
-		{ provide: SettingsTabProvider, useClass: TitleControlSettingsTabProvider },
+		{ provide: ConfigProvider, useClass: TitleControlConfigProvider, multi: true },
+		{ provide: SettingsTabProvider, useClass: TitleControlSettingsTabProvider, multi: true },
 	],
 	entryComponents: [
 		TitleControlSettingsTabComponent
@@ -29,4 +27,8 @@ debugger;
 		TitleControlSettingsTabComponent
 	],
 })
-export default class TitleControlModule { }
+export default class TitleControlModule {
+	constructor(private service: TitleControlService) {
+		this.service.init();
+	}
+}

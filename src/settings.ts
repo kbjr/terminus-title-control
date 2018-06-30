@@ -6,7 +6,7 @@ import { TitleControlSettingsTabComponent } from './components/settings-tab';
 
 @Injectable()
 export class TitleControlSettingsTabProvider extends SettingsTabProvider {
-	id = 'titleControl'
+	id = 'title-control'
 	title = 'Title Control'
 
 	getComponentType(): any {
