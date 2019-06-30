@@ -1,8 +1,9 @@
 {
   "compilerOptions": {
     "baseUrl": "src",
-    "module": "commonjs",
+    "module": "es2015",
     "target": "es2016",
+    "moduleResolution": "node",
     "declaration": false,
     "noImplicitAny": false,
     "removeComments": false,
@@ -12,10 +13,7 @@
     "noUnusedParameters": true,
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
-    "noUnusedParameters": true,
     "noUnusedLocals": true,
-    "declaration": true,
-    "declarationDir": "dist",
     "lib": [
       "dom",
       "es2015",
