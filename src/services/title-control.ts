@@ -4,7 +4,7 @@ import { ConfigService, AppService, BaseTabComponent, Logger, LogService, SplitT
 import { BaseTerminalTabComponent, TerminalTabComponent } from 'terminus-terminal'
 import { getChildProcesses, IChildProcess } from '../helpers/processes';
 
-const patternRegex = /(\\t|\\d|\\i|\\scmd|\\sname|\\spid|\\pid|\\cmd|\\e[^\s]+)/g;
+const patternRegex = /(\\t|\\d|\\i|\\scmd|\\sname|\\spid|\\pid|\\cmd|\\cwd|\\e[^\s]+)/g;
 
 @Injectable()
 export class TitleControlService {
@@ -178,6 +178,10 @@ const compileReplacePattern = (replacePattern : string) : Function => {
 					valueGetters.push(getCommand);
 					break;
 
+				case 'cwd':
+					valueGetters.push(getCwd);
+					break;
+
 				default:
 					valueGetters.push(() => match[0]);
 			}
@@ -273,6 +277,16 @@ const getPid = async (tab: BaseTabComponent) : Promise<string> => {
 		if (child && child.pid !== pid) {
 			return String(child.pid);
 		}
+	}
+
+	return '';
+};
+
+const getCwd = async (tab: BaseTerminalTabComponent) : Promise<string> => {
+	const cwd = await tab.session.getWorkingDirectory();
+
+	if (cwd) {
+		return cwd;
 	}
 
 	return '';
