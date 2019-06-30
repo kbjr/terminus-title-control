@@ -1,6 +1,7 @@
 
 import { Injectable } from '@angular/core';
-import { ConfigService, AppService, BaseTabComponent, Logger, LogService } from 'terminus-core';
+import { ConfigService, AppService, BaseTabComponent, Logger, LogService, SplitTabComponent } from 'terminus-core';
+import { BaseTerminalTabComponent, TerminalTabComponent } from 'terminus-terminal'
 import { getChildProcesses, IChildProcess } from '../helpers/processes';
 
 const patternRegex = /(\\t|\\d|\\i|\\scmd|\\sname|\\spid|\\pid|\\cmd|\\e[^\s]+)/g;
@@ -33,46 +34,38 @@ export class TitleControlService {
 	}
 
 	onTabsChange() : void {
-		this.app.tabs.forEach((tab) => {
-			if (! this.knownTabs.has(tab)) {
-				this.logger.debug(`New tab discovered id=${tab.id}`)
+		this.app.tabs.forEach((topLevelTab) => {
+			let subTabs = (topLevelTab instanceof SplitTabComponent) ? topLevelTab.getAllTabs() : [topLevelTab];
+			for (const tab of subTabs) {
+				if (tab instanceof BaseTerminalTabComponent) {
+					if (! this.knownTabs.has(tab)) {
+						this.logger.debug(`New tab discovered: ${tab}`)
 
-				this.knownTabs.set(tab, new TabState(tab));
+						this.knownTabs.set(tab, new TabState(tab));
 
-				this.onTabChange(tab);
+						this.processTabTitle(tab);
 
-				// @ts-ignore: This property does, in fact, exist
-				tab.titleChange$.subscribe(() => {
-					this.onTabChange(tab);
-				});
+						tab.titleChange$.subscribe(() => {
+							this.processTabTitle(tab);
+						});
+					}
+				}
 			}
 		});
 	}
 
-	onTabChange(tab: BaseTabComponent) : void {
+	async processTabTitle(tab: BaseTerminalTabComponent) : Promise<void> {
 		const tabState = this.knownTabs.get(tab);
 
 		if (tabState.ignoreNext && tabState.processedTitle === tab.title) {
 			tabState.ignoreNext = false;
+			return
 		}
 
-		else {
-			this.processTabTitle(tab, tabState);
-		}
-	}
-
-	async processTabTitle(tab: BaseTabComponent, tabState: TabState) : Promise<void> {
 		let { title: newTitle } = tab;
 		const { prefix, suffix, removePattern } = this.config.store.titleControl;
 
-		// @ts-ignore: This property does, in fact, exist
-		if (! tab.sessionOptions) {
-			this.logger.debug(`This tab does not appear to be a terminal, not processing id=${tab.id}`);
-
-			return;
-		}
-
-		this.logger.debug(`Processing title id=${tab.id}: "${newTitle}"`);
+		this.logger.debug(`Processing title ${tab}: "${newTitle}"`);
 
 		tabState.actualTitle = newTitle;
 
@@ -107,9 +100,8 @@ export class TitleControlService {
 		tabState.ignoreNext = true;
 		tabState.processedTitle = newTitle;
 
-		this.logger.debug(`Title processed id=${tab.id}: "${newTitle}"`);
+		this.logger.debug(`Title processed: ${tab} "${newTitle}"`);
 
-		// @ts-ignore: This property does, in fact, exist
 		tab.setTitle(newTitle);
 	}
 
@@ -166,10 +158,6 @@ const compileReplacePattern = (replacePattern : string) : Function => {
 				// 	valueGetters.push(getTabDirectoryName);
 				// 	break;
 
-				case 'i':
-					valueGetters.push(getTabId);
-					break;
-
 				case 'scmd':
 					valueGetters.push(getShellCommand);
 					break;
@@ -222,9 +210,8 @@ const getTabTitle = (tab: BaseTabComponent) : string => {
 };
 
 const getTabEnvVar = (name: string) : Function => {
-	return (tab: BaseTabComponent) : string => {
-		// @ts-ignore: This property does, in fact, exist
-		return tab.sessionOptions ? tab.sessionOptions.env[name] : '';
+	return (tab: BaseTerminalTabComponent) : string => {
+		return (tab instanceof TerminalTabComponent) ? tab.sessionOptions.env[name] : '';
 	};
 };
 
@@ -233,23 +220,16 @@ const getTabEnvVar = (name: string) : Function => {
 // 	return '';
 // };
 
-const getTabId = (tab: BaseTabComponent) : string => {
-	return String(tab.id);
-};
-
 const getShellCommand = (tab: BaseTabComponent) : string => {
-	// @ts-ignore: This property does, in fact, exist
-	return tab.shell ? tab.shell.command : '';
+	return (tab instanceof TerminalTabComponent) ? tab.sessionOptions.command : '';
 };
 
 const getShellName = (tab: BaseTabComponent) : string => {
-	// @ts-ignore: This property does, in fact, exist
-	return tab.shell ? tab.shell.name : '';
+	return (tab instanceof TerminalTabComponent) ? tab.sessionOptions.name : '';
 };
 
 const getShellPid = (tab: BaseTabComponent) : string => {
-	// @ts-ignore: This property does, in fact, exist
-	return tab.session ? tab.session.truePID : '';
+	return (tab instanceof TerminalTabComponent) ? (tab.session.truePID || 0).toString() : '';
 };
 
 const getLowestChildProcess = async (pid: number) : Promise<IChildProcess> => {
@@ -271,7 +251,7 @@ const getLowestChildProcess = async (pid: number) : Promise<IChildProcess> => {
 const getCommand = async (tab: BaseTabComponent) : Promise<string> => {
 	// @ts-ignore: This property does, in fact, exist
 	const pid = tab.session ? tab.session.truePID : null;
-	
+
 	if (pid) {
 		const child = await getLowestChildProcess(pid);
 
@@ -286,7 +266,7 @@ const getCommand = async (tab: BaseTabComponent) : Promise<string> => {
 const getPid = async (tab: BaseTabComponent) : Promise<string> => {
 	// @ts-ignore: This property does, in fact, exist
 	const pid = tab.session ? tab.session.truePID : null;
-	
+
 	if (pid) {
 		const child = await getLowestChildProcess(pid);
 
